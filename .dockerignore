@@ -1,0 +1,10 @@
+.git
+.gitignore
+.idea
+.vscode
+.venv
+__pycache__
+*.pyc
+benchmark-results
+k8s/overlays/minikube/secret.env
+

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vllm-config
+data:
+  MODEL_ID: Qwen/Qwen2.5-0.5B-Instruct
+  # Replace "main" with a full Hugging Face commit SHA for immutable production rollouts.
+  MODEL_REVISION: main
+  MODEL_MOUNT: /models
+  MODEL_SUBDIR: model
+  SERVED_MODEL_NAME: qwen2.5-0.5b-instruct
+  PORT: "8000"
+  DTYPE: bfloat16
+  MAX_MODEL_LEN: "2048"
+  MAX_NUM_SEQS: "8"
+  MAX_NUM_BATCHED_TOKENS: "2048"
+  VLLM_CPU_KVCACHE_SPACE: "2"
+  VLLM_CPU_NUM_OF_RESERVED_CPU: "1"
+

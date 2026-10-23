@@ -1,0 +1,6 @@
+# Runtime dependency contract for the main image.
+# The exact CPU runtime and all of its transitive dependencies are supplied by
+# the versioned official base image vllm/vllm-openai-cpu:v0.27.0-x86_64.
+# No unpinned Python package is installed on top of that image.
+vllm==0.27.0
+
