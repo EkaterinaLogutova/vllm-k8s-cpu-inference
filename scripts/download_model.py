@@ -54,7 +54,6 @@ def main() -> int:
         revision=revision,
         local_dir=target,
         token=token,
-        resume_download=True,
     )
 
     if not (target / "config.json").is_file():

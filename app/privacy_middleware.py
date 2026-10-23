@@ -11,6 +11,7 @@ import hmac
 import json
 import logging
 import os
+import sys
 import time
 import uuid
 from typing import Any, Awaitable, Callable
@@ -19,6 +20,17 @@ ASGIApp = Callable[[dict[str, Any], Callable[..., Awaitable[Any]], Callable[...,
 
 LOGGER = logging.getLogger("privacy_access")
 PUBLIC_PATHS = frozenset({"/health", "/metrics", "/version"})
+
+
+def _configure_logger() -> None:
+    """Attach a deterministic stderr handler inside the vLLM process."""
+    LOGGER.disabled = False
+    LOGGER.setLevel(logging.INFO)
+    LOGGER.propagate = False
+    if not LOGGER.handlers:
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        LOGGER.addHandler(handler)
 
 
 def _headers(scope: dict[str, Any]) -> dict[bytes, bytes]:
@@ -38,6 +50,7 @@ class PrivacyAndAuthMiddleware:
 
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
+        _configure_logger()
         self.api_token = os.environ.get("API_TOKEN", "")
         if not self.api_token:
             raise RuntimeError("API_TOKEN is required")
@@ -94,5 +107,6 @@ class PrivacyAndAuthMiddleware:
             "status": status_code,
             "duration_ms": round((time.perf_counter() - started) * 1000, 2),
         }
-        LOGGER.info(json.dumps(event, separators=(",", ":"), ensure_ascii=True))
+        if path not in PUBLIC_PATHS:
+            LOGGER.info(json.dumps(event, separators=(",", ":"), ensure_ascii=True))
 

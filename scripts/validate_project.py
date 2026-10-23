@@ -18,6 +18,7 @@ REQUIRED_FILES = (
     "app/privacy_middleware.py",
     "scripts/download_model.py",
     "scripts/load_test.py",
+    "scripts/verify_runtime_lock.py",
     "k8s/base/deployment.yaml",
     "k8s/base/pvc.yaml",
     "k8s/base/configmap.yaml",
@@ -36,7 +37,12 @@ def main() -> int:
     for relative in REQUIRED_FILES:
         check((ROOT / relative).is_file(), f"missing {relative}", errors)
 
-    for relative in ("app/privacy_middleware.py", "scripts/download_model.py", "scripts/load_test.py"):
+    for relative in (
+        "app/privacy_middleware.py",
+        "scripts/download_model.py",
+        "scripts/load_test.py",
+        "scripts/verify_runtime_lock.py",
+    ):
         source = (ROOT / relative).read_text(encoding="utf-8")
         try:
             ast.parse(source, filename=relative)
@@ -73,8 +79,12 @@ def main() -> int:
     check("await receive(" not in middleware, "privacy middleware reads request bodies", errors)
     check("compare_digest" in middleware, "token comparison is not constant-time", errors)
 
-    forbidden = ROOT / "k8s/overlays/minikube/secret.env"
-    check(not forbidden.exists(), "real secret.env must not be committed", errors)
+    gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    check(
+        "k8s/overlays/minikube/secret.env" in gitignore,
+        "real secret.env is not excluded by .gitignore",
+        errors,
+    )
 
     if errors:
         print("validation failed:", file=sys.stderr)

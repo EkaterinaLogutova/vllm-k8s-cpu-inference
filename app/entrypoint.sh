@@ -47,5 +47,6 @@ exec vllm serve "$MODEL_PATH" \
   --middleware privacy_middleware.PrivacyAndAuthMiddleware \
   --enable-request-id-headers \
   --disable-fastapi-docs \
+  --disable-access-log-for-endpoints /health,/metrics,/version \
   --uvicorn-log-level info
 

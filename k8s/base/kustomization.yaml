@@ -8,7 +8,9 @@ resources:
   - deployment.yaml
   - service.yaml
   - networkpolicy.yaml
-commonLabels:
-  app.kubernetes.io/name: vllm-cpu
-  app.kubernetes.io/part-of: kaspersky-internship-test
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/name: vllm-cpu
+      app.kubernetes.io/part-of: kaspersky-internship-test
 

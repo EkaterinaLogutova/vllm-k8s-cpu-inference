@@ -1,5 +1,4 @@
-# syntax=docker/dockerfile:1.7
-FROM python:3.12.12-slim-bookworm
+FROM python:3.12.12-slim-bookworm@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
 
 ARG APP_UID=10001
 ARG APP_GID=10001
@@ -9,9 +8,11 @@ RUN groupadd --gid ${APP_GID} downloader \
        --home-dir /home/downloader --shell /usr/sbin/nologin downloader
 
 COPY requirements-downloader.txt /tmp/requirements.txt
+COPY scripts/verify_runtime_lock.py /tmp/verify_runtime_lock.py
 RUN python -m pip install --no-cache-dir --disable-pip-version-check \
       --requirement /tmp/requirements.txt \
-    && rm /tmp/requirements.txt
+    && python /tmp/verify_runtime_lock.py /tmp/requirements.txt \
+    && rm /tmp/requirements.txt /tmp/verify_runtime_lock.py
 
 COPY --chown=${APP_UID}:${APP_GID} scripts/download_model.py /app/download_model.py
 

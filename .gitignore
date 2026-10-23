@@ -5,6 +5,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .venv/
-benchmark-results/
+benchmark-results/*.json
+benchmark-results/benchmark-*.md
+!benchmark-results/README.md
 k8s/overlays/minikube/secret.env
 
